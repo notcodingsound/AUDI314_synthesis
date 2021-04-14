@@ -2,43 +2,55 @@
 // Daniel Shiffman
 // http://codingtra.in
 // http://patreon.com/codingtrain
-// Code for: https://youtu.be/Bk8rLzzSink
+// Code for: https://youtu.be/jEwAMgcCgOA
 
-var wave;
-
+var song;
+var amp;
 var button;
-var slider;
-var playing = false;
+
+var volhistory = [];
+
+function toggleSong() {
+  if (song.isPlaying()) {
+    song.pause();
+  } else {
+    song.play();
+  }
+}
+
+function preload() {
+  song = loadSound('this-dot-kp.mp3');
+}
 
 function setup() {
-  createCanvas(100, 100);
-  wave = new p5.Oscillator();
-  slider = createSlider(100, 1200, 440);
-
-  wave.setType('sine');
-  wave.start();
-  wave.freq(440);
-  wave.amp(0);
-
-  button = createButton('play/pause');
-  button.mousePressed(toggle);
+  createCanvas(200, 200);
+  button = createButton('toggle');
+  button.mousePressed(toggleSong);
+  song.play();
+  amp = new p5.Amplitude();
 }
 
 function draw() {
-  wave.freq(slider.value());
-  if (playing) {
-    background(255, 0, 255);
-  } else {
-    background(51);
+  background(0);
+  var vol = amp.getLevel();
+  volhistory.push(vol);
+  stroke(255);
+  noFill();
+  push();
+  var currentY = map(vol, 0, 1, height, 0);
+  translate(0, height / 2 - currentY);
+  beginShape();
+  for (var i = 0; i < volhistory.length; i++) {
+    var y = map(volhistory[i], 0, 1, height, 0);
+    vertex(i, y);
   }
-}
+  endShape();
+  pop();
+  if (volhistory.length > width - 50) {
+    volhistory.splice(0, 1);
+  }
 
-function toggle() {
-  if (!playing) {
-    wave.amp(0.5, 1);
-    playing = true;
-  } else {
-    wave.amp(0, 1);
-    playing = false;
-  }
+  stroke(255, 0, 0);
+  line(volhistory.length, 0, volhistory.length, height);
+  //ellipse(100, 100, 200, vol * 200);
 }
