@@ -19,7 +19,7 @@ function toggleSong() {
 }
 
 function preload() {
-  song = loadSound('this-dot-kp.mp3');
+  song = loadSound('vocal.mp3');
 }
 
 function setup() {
